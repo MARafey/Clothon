@@ -1,0 +1,45 @@
+/* Navbar.css */
+.app-bar {
+  background-color: #2c3e50;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.menu-icon {
+  margin-right: 16px;
+}
+
+.nav-title {
+  font-family: 'Georgia', serif;
+  font-size: 24px;
+  color: #ecf0f1;
+}
+
+.list {
+  width: 100%;
+  padding: 0;
+}
+
+.list-item {
+  font-family: 'Arial', sans-serif;
+  padding: 16px 24px;
+  margin: 4px 0;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  transition: background-color 0.3s ease;
+}
+
+.list-item:hover {
+  background-color: #bdc3c7;
+}
+
+.list-item:active {
+  background-color: #95a5a6;
+}
+
+.cards-container {
+  padding: 16px;
+}
