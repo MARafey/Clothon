@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, List, ListItem, Drawer, Box, Grid } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, List, ListItem, Drawer, Box, Grid, Pagination, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ClothCard from './ClothCard';
 import './Navbar.css';
@@ -8,6 +8,9 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [clothData, setClothData] = useState([]);
   const [selectedShop, setSelectedShop] = useState('');
+  const [page, setPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState('');
+  const itemsPerPage = 28;
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -19,9 +22,9 @@ function Navbar() {
   useEffect(() => {
     if (selectedShop) {
       const jsonFiles = {
-      'Outfitter': '/CSV Files/Lamare.json',
-      'Lama': '/CSV Files/Lamare.json',
-      'Attire': '/CSV Files/Attire.json',
+        'Saphire': '/CSV Files/Saphire.json',
+        'Lama': '/CSV Files/Lamare.json',
+        'Attire': '/CSV Files/Attire.json',
       };
 
       if (selectedShop === 'View All') {
@@ -41,11 +44,9 @@ function Navbar() {
             });
             console.log(allClothData);
             setClothData(allClothData);
-
           })
           .catch((error) => console.error('Error fetching JSON files:', error));
-      }
-      else {
+      } else {
         fetch(jsonFiles[selectedShop])
           .then((response) => response.json())
           .then((data) => {
@@ -61,6 +62,26 @@ function Navbar() {
   const handleShopClick = (shop) => {
     setSelectedShop(shop);
     setIsOpen(false);
+    setPage(1);
+  };
+
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  const handleSortChange = (event) => {
+    setSortOrder(event.target.value);
+  };
+
+  const sortedAndPaginatedData = () => {
+    let sortedData = [...clothData];
+    if (sortOrder === 'highToLow') {
+      sortedData.sort((a, b) => parseFloat(b.Price) - parseFloat(a.Price));
+    } else if (sortOrder === 'lowToHigh') {
+      sortedData.sort((a, b) => parseFloat(a.Price) - parseFloat(b.Price));
+    }
+    const startIndex = (page - 1) * itemsPerPage;
+    return sortedData.slice(startIndex, startIndex + itemsPerPage);
   };
 
   return (
@@ -79,6 +100,20 @@ function Navbar() {
           <Typography variant="h6" component="div" className="nav-title">
             Clothon
           </Typography>
+          <FormControl variant="outlined" style={{ minWidth: 120, marginLeft: 'auto' }}>
+            <InputLabel>Sort by Price</InputLabel>
+            <Select
+              value={sortOrder}
+              onChange={handleSortChange}
+              label="Sort by Price"
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value="highToLow">High to Low</MenuItem>
+              <MenuItem value="lowToHigh">Low to High</MenuItem>
+            </Select>
+          </FormControl>
         </Toolbar>
       </AppBar>
       <Drawer anchor="left" open={isOpen} onClose={toggleDrawer(false)}>
@@ -89,7 +124,7 @@ function Navbar() {
           onKeyDown={toggleDrawer(false)}
         >
           <List className="list">
-            {['Outfitter', 'Lama', 'Attire', 'View All'].map((text, index) => (
+            {['Saphire', 'Lama', 'Attire', 'View All'].map((text, index) => (
               <ListItem button key={index} className="list-item" onClick={() => handleShopClick(text)}>
                 <Typography variant="button">{text}</Typography>
               </ListItem>
@@ -98,7 +133,7 @@ function Navbar() {
         </Box>
       </Drawer>
       <Grid container spacing={2} className="cards-container">
-        {clothData.map((cloth, index) => (
+        {sortedAndPaginatedData().map((cloth, index) => (
           <Grid item key={index}>
             <ClothCard
               name={cloth.Name}
@@ -109,6 +144,14 @@ function Navbar() {
           </Grid>
         ))}
       </Grid>
+      <Box display="flex" justifyContent="center" mt={3} mb={3}>
+        <Pagination
+          count={Math.ceil(clothData.length / itemsPerPage)}
+          page={page}
+          onChange={handleChangePage}
+          color="primary"
+        />
+      </Box>
     </>
   );
 }
