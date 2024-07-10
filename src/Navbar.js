@@ -19,8 +19,12 @@ function Navbar() {
     setIsOpen(open);
   };
 
-  useEffect(() => {
+  useEffect((e) => {
     if (selectedShop) {
+      // Clearing the card data when the shop is changed
+
+        setClothData([]);
+
       const jsonFiles = {
         'Saphire': '/CSV Files/Saphire.json',
         'Lama': '/CSV Files/Lamare.json',
